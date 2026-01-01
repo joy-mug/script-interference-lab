@@ -1,34 +1,43 @@
+import json
+from governance.taxonomy import (
+    LifecycleStage, LoadDriver, StructuralResponse, DamageSymptom, ConstraintState
+)
+from schema.reliability_input import CaseInput, FailureTags
+from pipeline.reliability_pipeline import ReliabilityPipeline
 
-print("RUN_REVIEW.PY IS EXECUTING")
-from agents.design_review_agent import DesignReviewAgent
-from pipeline.reliability_pipeline import run_reliability_pipeline
-from pipeline.schema import ReliabilityInput
 
+def load_case(path: str) -> CaseInput:
+    with open(path, "r", encoding="utf-8") as f:
+        raw = json.load(f)
 
-def main():
-    # 1. 準備 pipeline 的輸入資料
-    input_data = ReliabilityInput(
-        test_type="drop",
-        impact_scenario="corner_drop",
-        system_scope="housing_only",
-        screw_to_edge_distance_mm=2.1,
-        material_youngs_modulus_gpa=70.0,
+    tags = None
+    if raw.get("tags"):
+        t = raw["tags"]
+        tags = FailureTags(
+            load_driver=LoadDriver(t["load_driver"]),
+            structural_response=[StructuralResponse(x) for x in t["structural_response"]],
+            damage_symptom=[DamageSymptom(x) for x in t["damage_symptom"]],
+            location_archetype=t["location_archetype"],
+            constraint_state=ConstraintState(t["constraint_state"]),
+        )
+
+    return CaseInput(
+        case_id=raw["case_id"],
+        lifecycle_stage=LifecycleStage(raw["lifecycle_stage"]),
+        failure_summary=raw["failure_summary"],
+        test_context=raw["test_context"],
+        repeatability=raw.get("repeatability"),
+        design_state=raw.get("design_state"),
+        contact_evidence=raw.get("contact_evidence"),
+        ec_applied=raw.get("ec_applied"),
+        ec_description=raw.get("ec_description"),
+        ec_outcome=raw.get("ec_outcome"),
+        tags=tags,
     )
-
-    # 2. 執行 reliability pipeline
-    pipeline_output = run_reliability_pipeline(input_data)
-
-    # 3. 讓 agent 做 review
-    agent = DesignReviewAgent()
-    review_notes = agent.review(pipeline_output)
-
-    # 4. 印出結果
-    print("=== Pipeline Output ===")
-    print(pipeline_output)
-
-    print("\n=== Design Review Agent Output ===")
-    print(review_notes)
 
 
 if __name__ == "__main__":
-    main()
+    case = load_case("data/case_001.json")
+    pipe = ReliabilityPipeline(data_dir="data")
+    result = pipe.run(case)
+    print(json.dumps(result, indent=2, ensure_ascii=False))

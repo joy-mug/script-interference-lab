@@ -1,47 +1,19 @@
-from typing import Dict, Any
-from schema.reliability_input import ReliabilityInput
+import json
+from pathlib import Path
+from agents.design_review_agent import DesignReviewAgent
 
-def run_reliability_pipeline(
-    input_data: ReliabilityInput
-) -> Dict[str, Any]:
-    """
-    Core reliability inference pipeline.
+class ReliabilityPipeline:
+    def __init__(self, data_dir: str = "data"):
+        self.agent = DesignReviewAgent()
+        self.data_dir = Path(data_dir)
+        self.data_dir.mkdir(parents=True, exist_ok=True)
+        self.reviews_path = self.data_dir / "reviews.jsonl"
 
-    Assumptions:
-    - Early design stage
-    - Limited physical test data
-    - Inputs are design proxies, not final specs
-    """
+    def run(self, case_obj) -> dict:
+        result = self.agent.review(case_obj)
+        self._append_jsonl(self.reviews_path, result)
+        return result
 
-    # --- mock logic (Phase 1) ---
-    risk_score = 0.72
-
-    return {
-        "context": {
-            "test_type": input_data.test_type,
-            "system_scope": input_data.system_scope,
-            "impact_scenario": input_data.impact_scenario,
-        },
-        "risk_score": risk_score,
-        "risk_level": "High" if risk_score > 0.7 else "Medium",
-        "top_risk_factors": [
-            {
-                "proxy": "screw_to_edge_distance",
-                "trend": "low",
-                "contribution": 0.31,
-            },
-            {
-                "proxy": "youngs_modulus",
-                "trend": "high_relative_to_geometry",
-                "contribution": 0.21,
-            },
-        ],
-        "assumptions": [
-            "Evaluation targets early design stage with limited physical test data",
-            "Geometry parameters are simplified proxies",
-        ],
-        "limitations": [
-            "No automatic geometry modification",
-            "No solver execution or optimization",
-        ],
-    }
+    def _append_jsonl(self, path: Path, obj: dict) -> None:
+        with path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(obj, ensure_ascii=False) + "\n")

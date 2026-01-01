@@ -1,21 +1,34 @@
-"""
-Schema definition for reliability pipeline input.
-Defines the allowed design discussion space.
-"""
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
+from governance.taxonomy import (
+    LifecycleStage, LoadDriver, StructuralResponse, DamageSymptom, ConstraintState
+)
 
 
 @dataclass
-class ReliabilityInput:
-    # test context
-    test_type: str                 # e.g. "drop"
-    impact_scenario: str           # e.g. "corner_drop"
-    system_scope: str              # e.g. "housing_only"
+class FailureTags:
+    load_driver: LoadDriver
+    structural_response: List[StructuralResponse]
+    damage_symptom: List[DamageSymptom]
+    location_archetype: str
+    constraint_state: ConstraintState
 
-    # geometry / design proxies
-    screw_to_edge_distance_mm: float
-    material_youngs_modulus_gpa: float
 
-    # optional CAE reference
-    fea_result_id: Optional[str] = None
+@dataclass
+class CaseInput:
+    case_id: str
+    lifecycle_stage: LifecycleStage
+    failure_summary: str
+    test_context: str
+
+    # Optional but powerful
+    repeatability: Optional[str] = None          # e.g. "N=10, fail=3"
+    design_state: Optional[str] = None           # narrative
+    contact_evidence: Optional[bool] = None      # witness marks or not
+
+    # EC tracking for confidence governance
+    ec_applied: Optional[bool] = None
+    ec_description: Optional[str] = None
+    ec_outcome: Optional[str] = None             # "pass" | "fail" | "partial" | None
+
+    tags: Optional[FailureTags] = None

@@ -199,3 +199,13 @@ git restore --source main docs/dev-notes
 # Step 3 — Commit it
 git add docs/dev-notes
 git commit -m "Copy dev-notes from main branch"
+
+# Reset an Existing Local Repo
+# Fetch the latest changes from GitHub
+git fetch origin
+
+# Reset your local branch to match the remote branch (e.g., main)
+git reset --hard origin/main
+
+# Remove any untracked files/folders
+git clean -fd

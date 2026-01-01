@@ -77,3 +77,36 @@ Copy-Item -Path *.md -Destination C:\Target\Folder -Force
 
 # Verify files
 Get-ChildItem -Recurse -Filter *.md
+
+# display the tree
+tree /f
+
+# Using an explicit path variable (clean & safe)
+$path = "src\hp_reviewer"
+New-Item "$path\a.py", "$path\b.py", "$path\c.py" -ItemType File -Force
+
+# Get the absolute path of your repo
+ $repo = git rev-parse --show-toplevel 
+
+# Build an absolute target path
+$target = Join-Path $repo "src\hp_reviewer"
+
+# Create files using the absolute path
+ New-Item "$target\a.py", "$target\b.py", "$target\c.py" -ItemType File -Force
+
+# Session-scoped variable (TEMPORARY)
+ $target = "C:\path\to\folder"
+# Global variable (still TEMPORARY, but wider)
+ $global:target = "C:\path"
+# Permanent variable (profile-based)
+# Step 1 — Open your PowerShell profile
+ notepad $PROFILE
+# Step 2 — Add the variable
+ $targetRepo = "C:\Users\11006189\creo-drawing-automation"
+
+
+# This moves you back one folder (parent directory)
+ cd ..
+
+# Quick directory listing
+ ls

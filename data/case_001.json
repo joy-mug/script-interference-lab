@@ -1,0 +1,18 @@
+{
+  "case_id": "case_001",
+  "lifecycle_stage": "dvt",
+  "failure_summary": "Decoration part corner cracked; plastic at corner broke out during 30cm drop. Visible symptom: corner breakout and crack at narrow end region.",
+  "test_context": "Drop test, 30cm onto hard wood, corner impact. Witness marks confirm decoration corner hit floor directly.",
+  "contact_evidence": true,
+  "ec_applied": true,
+  "ec_description": "Add inner rib to reinforce; add hot-melt post around broken region (inner side) to fasten decoration to base.",
+  "ec_outcome": null,
+  "repeatability": null,
+  "tags": {
+    "load_driver": "impact_shock",
+    "structural_response": ["contact_amplification", "stress_concentration", "local_bending"],
+    "damage_symptom": ["crack_fracture"],
+    "location_archetype": "decoration_corner_termination_narrow_region",
+    "constraint_state": "semi_constrained"
+  }
+}
