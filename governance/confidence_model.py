@@ -13,6 +13,15 @@ def assign_confidence(case: CaseInput, mode: ReviewerMode, evidence: EvidenceSou
     has_ec_outcome = bool(case.ec_outcome and case.ec_outcome.lower() in ("pass", "fail", "partial"))
     has_before_after = bool(case.ec_applied is True and has_ec_outcome)
 
+    # Track why L2 is blocked (internal, non-behavioral)
+    l2_block_reasons = []
+
+    if not has_before_after:
+        l2_block_reasons.append("missing_ec_before_after_confirmation")
+
+    if not has_repeatability:
+        l2_block_reasons.append("missing_repeatability_evidence")
+
     if has_before_after and has_repeatability:
         # Still conservative: L2 implies validated outcome
         return ConfidenceLevel.L2
