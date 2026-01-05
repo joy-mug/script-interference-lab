@@ -3,6 +3,7 @@ from schema.reliability_input import CaseInput
 from governance.reviewer_modes import select_mode, gate_mode_1, gate_mode_2
 from governance.evidence_rules import classify_evidence_source
 from governance.confidence_model import assign_confidence
+from governance.taxonomy import ConfidenceLevel
 
 
 class DesignReviewAgent:
@@ -19,20 +20,27 @@ class DesignReviewAgent:
             }
 
         evidence = classify_evidence_source(case)
-        confidence = assign_confidence(case, mode, evidence)
+        confidence, l2_block_reasons = assign_confidence(case, mode, evidence)
 
         # Minimal “feedback” payload (expand later)
-        return {
+        result = {
             "status": "OK",
             "mode": mode.value,
             "evidence_source": evidence.value,
             "confidence": confidence.value,
             "tags": asdict(case.tags) if case.tags else None,
-            "recommendation": self._recommend(case),
+            "recommendation": self._recommend(case, confidence),
             "case": asdict(case),
         }
 
-    def _recommend(self, case: CaseInput) -> dict:
+        if confidence == ConfidenceLevel.L1 and l2_block_reasons:
+            result["confidence_notes"] = l2_block_reasons
+
+        return result
+
+
+
+    def _recommend(self, case: CaseInput, confidence: ConfidenceLevel) -> dict:
         # MVP: rule-driven, no overreach.
         # Always returns: hypothesis/rationale + next action + escalation flag
         tags = case.tags
@@ -44,10 +52,18 @@ class DesignReviewAgent:
         }
 
         if tags:
-            rec["top_hypothesis"] = (
-                f"{tags.load_driver.value} -> {', '.join([r.value for r in tags.structural_response])} "
-                f"-> {', '.join([d.value for d in tags.damage_symptom])} @ {tags.location_archetype}"
+            hypothesis = (
+                f"{tags.load_driver.value} -> "
+                f"{', '.join([r.value for r in tags.structural_response])} "
+                f"-> {', '.join([d.value for d in tags.damage_symptom])} "
+                f"@ {tags.location_archetype}"
             )
+
+            if confidence == ConfidenceLevel.L2:
+                rec["top_hypothesis"] = hypothesis
+            else:
+                rec["top_hypothesis"] = f"[PROVISIONAL] {hypothesis}"
+
 
         # Decision ladder: prefer physical confirmation before CAE
         if case.ec_applied and not case.ec_outcome:
@@ -61,3 +77,4 @@ class DesignReviewAgent:
         # Escalation triggers (minimal): disagreement/dispersion/safety would be fields later
         # Keep false by default in MVP.
         return rec
+

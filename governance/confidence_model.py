@@ -1,11 +1,16 @@
 from schema.reliability_input import CaseInput
 from .taxonomy import ConfidenceLevel, ReviewerMode, EvidenceSource
+from typing import Tuple, List
 
+def assign_confidence(
+    case: CaseInput,
+    mode: ReviewerMode,
+    evidence: EvidenceSource
+) -> tuple[ConfidenceLevel, list[str]]:
 
-def assign_confidence(case: CaseInput, mode: ReviewerMode, evidence: EvidenceSource) -> ConfidenceLevel:
     # Mode 1 is always hypothesis by governance.
     if mode == ReviewerMode.MODE_1:
-        return ConfidenceLevel.L0
+        return ConfidenceLevel.L0, []
 
     # Mode 2 starts at Supported unless explicitly validated.
     # L2 requires: before/after test confirmation + repeatability info.
@@ -24,6 +29,6 @@ def assign_confidence(case: CaseInput, mode: ReviewerMode, evidence: EvidenceSou
 
     if has_before_after and has_repeatability:
         # Still conservative: L2 implies validated outcome
-        return ConfidenceLevel.L2
+        return ConfidenceLevel.L2, []
 
-    return ConfidenceLevel.L1
+    return ConfidenceLevel.L1, l2_block_reasons
