@@ -209,3 +209,17 @@ git reset --hard origin/main
 
 # Remove any untracked files/folders
 git clean -fd
+
+
+# I segment of commit
+# Git opened Vim to let you write the commit message
+  git commit
+# Press exactly this key (once):
+  i
+# Step 2: Type the commit message
+# Step 3: Exit insert mode
+  Esc
+# Step 4: Save and quit Vim
+  :wq
+# Then press:
+  Enter
