@@ -1,0 +1,23 @@
+{
+    "case_id": "case_002",
+    "lifecycle_stage": "evt",
+    "failure_summary": "Hairline crack observed near hinge-side decoration after handling. No single drop event confirmed; damage discovered during inspection.",
+    "test_context": "Discovery: Damage observed during EVT assembly/handling; no controlled drop event recorded at time of discovery.\nReproduction/Hypothesis: Free drop test (unconstrained release from 30 cm onto hard surface) considered as representative loading condition; no shock machine or fixture involved.",
+    "repeatability": null,
+    "design_state": "early EVT build; decoration mounting under evaluation",
+    "contact_evidence": false,
+    "ec_applied": false,
+    "ec_description": null,
+    "ec_outcome": null,
+    "tags": {
+        "load_driver": "impact_shock",
+        "structural_response": [
+            "local_bending"
+        ],
+        "damage_symptom": [
+            "crack_fracture"
+        ],
+        "location_archetype": "hinge_adjacent_decoration_edge",
+        "constraint_state": "floating"
+    }
+}

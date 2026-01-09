@@ -37,7 +37,7 @@ def load_case(path: str) -> CaseInput:
 
 
 if __name__ == "__main__":
-    case = load_case("data/case_001.json")
+    case = load_case("data/case_002.json")
     pipe = ReliabilityPipeline(data_dir="data")
     result = pipe.run(case)
     print(json.dumps(result, indent=2, ensure_ascii=False))
